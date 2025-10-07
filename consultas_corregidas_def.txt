@@ -1,0 +1,115 @@
+-- CONSULTA 1: Hacer una consulta que nos diga cual es el Mes y año con más eventos realizados.
+-- Objetivo: Identificar el período (año/mes) con mayor cantidad de eventos. Ayuda a prever picos y temporadas bajas al organizar eventos.
+
+select anio, mes, total from
+(select year(fechaEvento)  as anio, month(fechaEvento) as mes, COUNT(*) as total
+from evento group by year(fechaEvento), month(fechaEvento)
+order by total desc) as q1
+where total = (select max(total) from (select count(*) as total from Evento
+			   group by year(fechaEvento), month(fechaEvento))as total__por_mes);
+
+-- CONSULTA 2: hacer una consulta que nos diga que usuarios han cambiado contraseña más de una vez y cuándo fue su último cambio.
+-- Objetivo: Detectar usuarios con alta rotación de contraseña y conocer la fecha del último cambio, útil para auditoría y seguridad.
+
+SELECT  u.idUsuario, u.nombre, u.apellido, COUNT(c.idContraseña)    AS total_cambios, MAX(c.`fechaCreacion`)   AS ultimo_cambio
+FROM `Usuario` u JOIN `Contraseña` c ON c.`Usuario_idUsuario` = u.`idUsuario` GROUP BY u.idUsuario, u.nombre, u.apellido
+HAVING COUNT(c.idContraseña) > 1
+ORDER BY total_cambios DESC;
+
+-- CONSULTA 3: Hacer una consulta que nos diga en qué eventos ha participado una organización externa.
+-- Objetivo: Ver el historial de participación de una organización en eventos, incluyendo si asistió con representante legal o alterno.
+
+SELECT oe.idOrganizacionExterna, oe.nombreOrganizacion, e.idEvento, e.nombre_Evento, e.fechaEvento, e.tipoEvento,
+p.asistenciaRepLegal, p.nombreRepAlterno
+FROM `organizaciónexterna` oe
+JOIN `Participa` p  ON p.OrganizaciónExterna_idOrganizacionExterna = oe.idOrganizacionExterna
+JOIN `Evento` e     ON e.idEvento = p.Evento_idEvento
+WHERE oe.nombreOrganizacion = 'TechCorp'
+ORDER BY e.fechaEvento;
+
+
+-- CONSULTA 4: Hacer una consulta que nos diga cuáles organizaciones van con representante legal y cuáles con alterno.
+-- Objetivo: Distinguir el tipo de representación con la que participa cada organización en los eventos.
+
+SELECT DISTINCT oe.idOrganizacionExterna, oe.nombreOrganizacion
+FROM `OrganizaciónExterna` oe
+JOIN `Participa` p ON p.OrganizaciónExterna_idOrganizacionExterna = oe.idOrganizacionExterna
+WHERE p.asistenciaRepLegal = 'Si'
+ORDER BY oe.nombreOrganizacion;
+
+-- Con el representante alterno:
+
+SELECT DISTINCT oe.idOrganizacionExterna, oe.nombreOrganizacion, p.nombreRepAlterno
+FROM `OrganizaciónExterna` oe
+JOIN `Participa` p ON p.OrganizaciónExterna_idOrganizacionExterna = oe.idOrganizacionExterna
+WHERE p.asistenciaRepLegal = 'No'
+ORDER BY oe.nombreOrganizacion;
+
+-- CONSULTA 5:  Hacer una consulta que nos diga en qué estado se encuentran los eventos.
+-- Objetivo: Visualizar rápidamente el estado de cada evento (aprobado, revisión o rechazado).
+
+SELECT idEvento, nombre_Evento, estadoEvento FROM `Evento`
+ORDER BY idEvento;
+
+-- CONSULTA 6: Hacer una consulta que nos diga el rol de cada usuario
+-- Objetivo: Listar a cada usuario con su rol para control de acceso y perfiles.
+
+SELECT idUsuario, nombre, apellido, rol FROM `Usuario`
+ORDER BY rol, apellido, nombre;
+
+-- CONSULTA 7: Hacer una consulta que nos diga cuáles instalaciones (lugares) son más utilizadas.
+-- Objetivo: Identificar qué instalaciones (salones, auditorios, etc.) se usan más, útil para programación y mantenimiento.
+
+SELECT l.idLugar, l.ubicacion, l.nombreLugar, COUNT(le.idlugar_evento) AS veces_usado
+FROM `Lugar` l LEFT JOIN `lugar_evento` le ON le.Lugar_idLugar = l.idLugar
+GROUP BY l.idLugar, l.ubicacion, l.nombreLugar
+ORDER BY veces_usado DESC, l.idLugar;
+
+-- CONSULTA 8: Hacer una consulta que nos diga  las organizaciones externas que han participado en uno o más eventos.
+-- Objetivo: Saber qué organizaciones tienen vínculos activos con la universidad y cuántas veces han participado.
+
+SELECT oe.idOrganizacionExterna, oe.nombreOrganizacion, COUNT(p.idParticipa) AS total_eventos FROM `OrganizaciónExterna` oe
+LEFT JOIN `Participa` p ON p.OrganizaciónExterna_idOrganizacionExterna = oe.idOrganizacionExterna
+GROUP BY oe.idOrganizacionExterna, oe.nombreOrganizacion
+HAVING total_eventos >= 1
+ORDER BY total_eventos DESC, oe.nombreOrganizacion;
+
+-- CONSULTA 9: Hacer una consulta que nos diga las evaluaciones realizadas por la secretaría académica-
+-- Objetivo: Ver las evaluaciones hechas por usuarios con rol 'Secretario Académico', útil para auditorías y seguimiento de decisiones.
+
+select u.idUsuario, u.nombre, ee.idEvaluacionEvento, e.nombre_Evento
+from usuario as u inner join EvaluacionEvento ee
+on idUsuario = Usuario_idUsuario inner join evento e on idEvento = Evento_idEvento
+order by u.idUsuario;
+
+
+-- CONSULTA 10: Hacer una consulta que nos diga Qué unidades académicas han hecho más eventos
+-- Objetivo: Medir la actividad por unidad académica (contando eventos distintos) para priorizar recursos y reconocer gestión.
+
+SELECT ua.idUnidadAcademica, ua.nombre AS unidad_academica, COUNT(DISTINCT e.idEvento) AS eventos_distintos
+FROM `UnidadAcademica` ua LEFT JOIN `Unidad_usuario` uu 
+ON uu.UnidadAcademica_idUnidadAcademica = ua.idUnidadAcademica
+LEFT JOIN `Usuario` u ON u.idUsuario = uu.Usuario_idUsuario
+LEFT JOIN `usuario_organizador` uo ON uo.Usuario_idUsuario = u.idUsuario
+LEFT JOIN `Evento` e ON e.idEvento = uo.Evento_idEvento
+GROUP BY ua.idUnidadAcademica, ua.nombre
+ORDER BY eventos_distintos DESC, ua.nombre;
+
+-- CONSULTA 11: Hacer una consulta que nos diga cuales son los eventos que estan el mismo día y en el mismo lugar
+-- Objetivo: Detectar sobre-reservas, de un mismo espacio en la misma fecha.
+
+SELECT  l.`idLugar`, l.`ubicacion`, e.`fechaEvento`, COUNT(*) AS eventos_programados
+FROM `lugar_evento` le JOIN `Lugar`  l ON l.`idLugar`   = le.`Lugar_idLugar`
+JOIN `Evento` e ON e.`idEvento`  = le.`Evento_idEvento` GROUP BY l.`idLugar`, l.`ubicacion`, e.`fechaEvento`
+HAVING COUNT(*) > 1
+ORDER BY eventos_programados DESC;
+
+-- CONSULTA 12: Hacer una consulta que nos diga cuántos eventos han sido lúdicos y cuántos académicos
+-- Objetivo: Ver el balance entre actividades académicas y lúdicas en la institución.
+
+SELECT tipoEvento, COUNT(*) AS total FROM `Evento` GROUP BY tipoEvento
+ORDER BY total DESC;
+
+ 
+
+
