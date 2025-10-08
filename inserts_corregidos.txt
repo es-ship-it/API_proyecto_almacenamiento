@@ -1,0 +1,139 @@
+-- ---------- USUARIOS (20) ----------
+INSERT INTO `Proyecto`.`Usuario` (`idUsuario`,`nombre`,`apellido`,`correo`,`rol`) VALUES
+(1,'Ana','Gonzalez','ana.gonzalez@uni.edu','Docente'),
+(2,'Carlos','Ramirez','carlos.ramirez@uni.edu','Docente'),
+(3,'María','Lopez','maria.lopez@uni.edu','Docente'),
+(4,'Javier','Martinez','javier.martinez@uni.edu','Docente'),
+(5,'Lorena','Diaz','lorena.diaz@uni.edu','Docente'),
+(6,'Felipe','Rios','felipe.rios@uni.edu','Docente'),
+(7,'Pablo','Suarez','pablo.suarez@uni.edu','Docente'),
+(8,'Nuria','Vega','nuria.vega@uni.edu','Docente'),
+(9,'Juan','Perez','juan.perez@student.uni.edu','Estudiante'),
+(10,'Catalina','Ruiz','catalina.ruiz@student.uni.edu','Estudiante'),
+(11,'Diego','Torres','diego.torres@student.uni.edu','Estudiante'),
+(12,'Karla','Mejia','karla.mejia@student.uni.edu','Estudiante'),
+(13,'Andres','Cano','andres.cano@student.uni.edu','Estudiante'),
+(14,'Sofia','Castro','sofia.castro@student.uni.edu','Estudiante'),
+(15,'Luis','Barrera','luis.barrera@student.uni.edu','Estudiante'),
+(16,'Valentina','Herrera','valentina.herrera@student.uni.edu','Estudiante'),
+(17,'Mateo','Nunez','mateo.nunez@student.uni.edu','Estudiante'),
+(18,'Marta','Gomez','marta.gomez@uni.edu','Secretario Académico'),
+(19,'Ricardo','Salazar','ricardo.salazar@uni.edu','Secretario Académico'),
+(20,'Olga','Paredes','olga.paredes@uni.edu','Secretario Académico');
+
+-- ---------- CONTRASEÑAS (1 por usuario) ----------
+INSERT INTO `Proyecto`.`Contraseña` (`idContraseña`,`clave`,`fechaCreacion`,`vigente`,`Usuario_idUsuario`) VALUES
+(1,'$2y$10$hash1','2025-10-01','Si',1),
+(2,'$2y$10$hash2','2025-10-01','Si',2),
+(3,'$2y$10$hash3','2025-10-01','Si',3),
+(4,'$2y$10$hash4','2025-10-01','Si',4),
+(5,'$2y$10$hash5','2025-10-01','Si',5),
+(6,'$2y$10$hash6','2025-10-01','Si',6),
+(7,'$2y$10$hash7','2025-10-01','Si',7),
+(8,'$2y$10$hash8','2025-10-01','Si',8),
+(9,'$2y$10$hash9','2025-10-01','Si',9),
+(10,'$2y$10$hash10','2025-10-01','Si',10),
+(11,'$2y$10$hash11','2025-10-01','Si',11),
+(12,'$2y$10$hash12','2025-10-01','Si',12),
+(13,'$2y$10$hash13','2025-10-01','Si',13),
+(14,'$2y$10$hash14','2025-10-01','Si',14),
+(15,'$2y$10$hash15','2025-10-01','Si',15),
+(16,'$2y$10$hash16','2025-10-01','Si',16),
+(17,'$2y$10$hash17','2025-10-01','Si',17),
+(18,'$2y$10$hash18','2025-10-01','Si',18),
+(19,'$2y$10$hash19','2025-10-01','Si',19),
+(20,'$2y$10$hash20','2025-10-01','Si',20);
+
+-- ---------- FACULTADES ----------
+INSERT INTO `Proyecto`.`Facultad` (`idFacultad`,`nombre`,`telefono`) VALUES
+(1,'Facultad de Ingeniería','+57-1-1111111'),
+(2,'Facultad de Ciencias Sociales','+57-1-2222222');
+
+-- ---------- UNIDADES ACADEMICAS ----------
+INSERT INTO `Proyecto`.`UnidadAcademica` (`idUnidadAcademica`,`nombre`,`Facultad_idFacultad`) VALUES
+(1,'Departamento de Matemáticas',1),
+(2,'Departamento de Física',1),
+(3,'Departamento de Historia',2);
+
+-- ---------- PROGRAMAS ACADEMICOS ----------
+INSERT INTO `Proyecto`.`ProgramaAcademico` (`idProgramaAcademico`,`nombre`,`Facultad_idFacultad`) VALUES
+(1,'Ingeniería de Sistemas',1),
+(2,'Física',1),
+(3,'Historia',2);
+
+-- ---------- LUGARES ----------
+INSERT INTO `Proyecto`.`Lugar` (`idLugar`,`ubicacion`,`capacidad`,`nombreLugar`) VALUES
+(1,'Edificio A - Aula 101',80,'Aula 101 Edificio A'),
+(2,'Auditorio Central',400,'Auditorio Central'),
+(3,'Patio Principal',500,'Patio Principal');
+
+-- ---------- ORGANIZACIONES EXTERNAS ----------
+INSERT INTO `Proyecto`.`OrganizaciónExterna` (`idOrganizacionExterna`,`nombreOrganizacion`,`nombreRepOrganizacion`,`ubicacionOrganizacion`,`sectorEconomicoOrganizacion`,`actividadPrincipalOrganizacion`,`numeroTelOrganizacion`) VALUES
+(1,'Fundación Ciencia Viva','Laura Mejia','Ciudad','Educación','Divulgación científica','+57-3001111111'),
+(2,'Empresa TechSol','Andres Blanco','Ciudad','Tecnología','Consultoría','+57-3002222222'),
+(3,'Museo Local','Carmen Rueda','Ciudad','Cultura','Exhibiciones','+57-3003333333');
+
+-- ---------- EVENTOS (fechas >= 2025-10-07, estado 'Revision') ----------
+INSERT INTO `Proyecto`.`Evento` (`idEvento`,`nombre_Evento`,`tipoEvento`,`descripcionEvento`,`fechaEvento`,`horaInicioEvento`,`horaFinEvento`,`estadoEvento`,`evento_OrganizadoPor`,`tipoAvalEvento`) VALUES
+(1,'Seminario de IA','Academico','Seminario sobre IA y educación','2025-10-15','09:00:00','12:00:00','Revision','Docente','DirectorPrograma'),
+(2,'Feria de Ciencia','Ludico','Feria con proyectos estudiantiles','2025-10-20','10:00:00','16:00:00','Revision','Estudiante','DirectorDocencia'),
+(3,'Jornada de Historia','Academico','Charlas y exposiciones de historia regional','2025-11-05','14:00:00','17:00:00','Revision','Docente','DirectorPrograma');
+
+-- ---------- EVALUACIONEVENTO (solo por secretarios: usuarios 18-20) ----------
+-- (asegúrate de que los triggers comparen rol case/acentos según tu collation; aquí usamos usuarios 18-20 (Secretario Académico))
+INSERT INTO `Proyecto`.`EvaluacionEvento` (`idEvaluacionEvento`,`jutificacionEvaluación`,`evaluacion_ActaURL`,`fechaEvaluación`,`Evento_idEvento`,`Usuario_idUsuario`,`estado`) VALUES
+(1,'Evaluación positiva','https://uni.edu/actas/acta1.pdf','2025-10-16 11:30:00',1,18,'aprobado'),
+(2,'Requiere ajustes',NULL,'2025-10-21 12:00:00',2,19,'rechazado'),
+(3,'Aprobado con observaciones','https://uni.edu/actas/acta3.pdf','2025-11-06 15:00:00',3,20,'aprobado');
+
+-- ---------- PARTICIPA (organizaciones externas en eventos) ----------
+INSERT INTO `Proyecto`.`Participa` (`idParticipa`,`certificadoParticipacionURL`,`asistenciaRepLegal`,`nombreRepAlterno`,`OrganizaciónExterna_idOrganizacionExterna`,`Evento_idEvento`) VALUES
+(1,'https://uni.edu/certificados/cert1.pdf','Si',NULL,1,1),
+(2,'https://uni.edu/certificados/cert2.pdf','Si','Carlos Ruiz',2,2),
+(3,'https://uni.edu/certificados/cert3.pdf','No',NULL,3,3);
+
+-- ---------- USUARIO_ORGANIZADOR (solo Docentes o Estudiantes) ----------
+INSERT INTO `Proyecto`.`usuario_organizador` (`Usuario_idUsuario`,`Evento_idEvento`,`id_usuario_organizador`,`evento_AvalURL`) VALUES
+(1,1,'uo_1','https://uni.edu/avales/aval1.pdf'),   -- docente organiza evento 1
+(9,2,'uo_2',NULL),                                 -- estudiante organiza evento 2
+(3,3,'uo_3','https://uni.edu/avales/aval3.pdf');   -- docente organiza evento 3
+
+-- ---------- LUGAR_EVENTO ----------
+INSERT INTO `Proyecto`.`lugar_evento` (`idlugar_evento`,`Lugar_idLugar`,`Evento_idEvento`) VALUES
+(1,2,1), -- evento 1 en Auditorio Central
+(2,1,2), -- evento 2 en Aula 101
+(3,3,3); -- evento 3 en Patio Principal
+
+-- ---------- PROGRAMA_USUARIO (solo Estudiantes) ----------
+INSERT INTO `Proyecto`.`programa_usuario` (`idprograma_usuario`,`ProgramaAcademico_idProgramaAcademico`,`Usuario_idUsuario`) VALUES
+(1,1,9),
+(2,1,10),
+(3,2,11),
+(4,3,12),
+(5,1,13),
+(6,2,14),
+(7,3,15),
+(8,1,16),
+(9,2,17);
+
+-- ---------- UNIDAD_USUARIO (solo Docentes) ----------
+INSERT INTO `Proyecto`.`Unidad_usuario` (`idUnidad_usuario`,`Usuario_idUsuario`,`UnidadAcademica_idUnidadAcademica`) VALUES
+(1,1,1),
+(2,2,1),
+(3,3,2),
+(4,4,2),
+(5,5,1),
+(6,6,2),
+(7,7,3),
+(8,8,3);
+
+-- ---------- FACULTAD_USUARIO (solo Secretarios Académicos) ----------
+INSERT INTO `Proyecto`.`Facultad_usuario` (`idFacultad_usuario`,`Usuario_idUsuario`,`Facultad_idFacultad`) VALUES
+(1,18,1),
+(2,19,2),
+(3,20,1);
+
+-- ---------- VALIDACIONES ADICIONALES (ejemplos no duplicados ya cubiertos) ----------
+-- No insertamos duplicados que los triggers impedirían.
+
+-- FIN DE LOS INSERTS
